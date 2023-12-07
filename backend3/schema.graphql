@@ -1,0 +1,67 @@
+query MyQuery{
+  ethereum(network: ethereum) {
+    addressStats(
+      address: {is: "0xA7EFAe728D2936e78BDA97dc267687568dD593f3"}
+    ) {
+      address {
+        callTxCount
+        calledTxCount
+        receiveFromCount
+        receiveFromCurrencies
+        receiveTxCount
+        sendToCurrencies
+        sendTxCount
+        sendToCount
+        sendAmount
+        daysWithTransfers
+        daysWithTransactions
+        daysWithSent
+        daysWithReceived
+      }
+    }
+    dexTrades(
+      options: {desc: "block.height", limit: 10}
+      makerOrTaker: {is: "0xA7EFAe728D2936e78BDA97dc267687568dD593f3"}
+      date: {after: "2022-12-31"}
+    ) {
+      transaction {
+        hash
+      }
+      smartContract {
+        address {
+          address
+        }
+        contractType
+        currency {
+          name
+        }
+      }
+      tradeIndex
+      date {
+        date
+      }
+      block {
+        height
+      }
+      buyAmount
+      buyAmountInUsd: buyAmount(in: USD)
+      buyCurrency {
+        symbol
+        address
+      }
+      sellAmount
+      sellAmountInUsd: sellAmount(in: USD)
+      sellCurrency {
+        symbol
+        address
+      }
+      sellAmountInUsd: sellAmount(in: USD)
+      tradeAmount(in: USD)
+      transaction {
+        gasValue
+        gasPrice
+        gas
+      }
+    }
+  }
+}
