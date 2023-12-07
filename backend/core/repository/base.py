@@ -64,7 +64,7 @@ class BaseRepository(Generic[ModelType]):
         :param join_: The joins to make.
         :return: The model instance.
         """
-        query = self._query(join_)
+        query = await self._query(join_)
         query = await self._get_by(query, field, value)
 
         if join_ is not None:
@@ -83,7 +83,7 @@ class BaseRepository(Generic[ModelType]):
         """
         self.session.delete(model)
 
-    def _query(
+    async def _query(
         self,
         join_: set[str] | None = None,
         order_: dict | None = None,
@@ -191,7 +191,7 @@ class BaseRepository(Generic[ModelType]):
         :param value: The value to filter by.
         :return: The filtered query.
         """
-        return query.where(getattr(self.model_class, field) == value)
+        return await query.where(getattr(self.model_class, field) == value)
 
     def _maybe_join(self, query: Select, join_: set[str] | None = None) -> Select:
         """

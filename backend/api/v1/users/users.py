@@ -8,7 +8,7 @@ from app.schemas.extras.token import Token
 from app.schemas.requests.users import LoginUserRequest, RegisterUserRequest
 from app.schemas.responses.users import UserResponse
 from core.factory import Factory
-from core.fastapi.dependencies import AuthenticationRequired
+from core.fastapi.dependencies.authentication import AuthenticationRequired
 from core.fastapi.dependencies.current_user import get_current_user
 from core.fastapi.dependencies.permissions import Permissions
 
