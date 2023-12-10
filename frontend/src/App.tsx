@@ -1,7 +1,19 @@
 import * as React from 'react';
-import {ChakraProvider, Box, VStack, Heading, SimpleGrid, HStack} from '@chakra-ui/react';
+import {
+    ChakraProvider,
+    Box,
+    VStack,
+    Heading,
+    SimpleGrid,
+    HStack,
+    TabPanel,
+    TabPanels,
+    Tab,
+    Tabs, TabList
+} from '@chakra-ui/react';
 import SearchBar from './components/SearchBar';
 import StatisticCard from './components/StatisticCard';
+import Chat from "./components/Chat";
 
 // type Stat = {
 //     title: string
@@ -14,7 +26,6 @@ const App = () => {
 
     const handleSearch = async (address: string) => {
         // setAddress(address);
-        // Replace '/api/statistics' with the actual endpoint you need to hit
         try {
             const response = await fetch(`http://localhost:8000/stats/${address}`);
             const data = await response.json();
@@ -30,15 +41,28 @@ const App = () => {
         <ChakraProvider>
             <Box textAlign="center" fontSize="xl">
                 <VStack spacing={8}>
-                    <HStack>
+                    <HStack spacing={12}>
                         <Heading>Web3 Wrapped</Heading>
                         <SearchBar onSearch={handleSearch} />
                     </HStack>
-                    <SimpleGrid columns={[1, 2, 3]} spacing={10}>
-                        {Object.entries(statistics).map(([key, value], index) => (
-                            <StatisticCard key={index} title={key} value={String(value)} />
-                        ))}
-                    </SimpleGrid>
+                    <Tabs isFitted variant="enclosed">
+                        <TabList mb="1em">
+                            <Tab>Statistics</Tab>
+                            <Tab>Chat</Tab>
+                        </TabList>
+                        <TabPanels>
+                            <TabPanel>
+                                <SimpleGrid columns={[1, 2, 3]} spacing={10}>
+                                    {Object.entries(statistics).map(([key, value], index) => (
+                                        <StatisticCard key={index} title={key} value={String(value)} />
+                                    ))}
+                                </SimpleGrid>
+                            </TabPanel>
+                            <TabPanel>
+                                <Chat />
+                            </TabPanel>
+                        </TabPanels>
+                    </Tabs>
                 </VStack>
             </Box>
         </ChakraProvider>
