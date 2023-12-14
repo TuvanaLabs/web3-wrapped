@@ -120,8 +120,8 @@ query getStats($blockchain_address: String!) {
 
     return result
 
-
-# gql-cli https://graphql.bitquery.io --print-schema --schema-download input_value_deprecation:true > schema.graphql
+#  gql-cli https://graphql.bitquery.io --headers X-API-KEY:BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt --print-schema > schema.graphql
+#  gql-cli https://streaming.bitquery.io/graphql --headers X-API-KEY:BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt --print-schema --verbose > schema.graphql
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

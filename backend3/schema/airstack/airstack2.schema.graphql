@@ -1,0 +1,476 @@
+directive @binding(constraint: String!, errorCode: String!) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""Marketplace Query"""
+type AirQuery {
+  """ID of the query"""
+  id: ID
+
+  """Published query data"""
+  publishedQuery: PublishedAirQueryData
+
+  """Saved query data"""
+  savedQuery: SavedAirQueryData
+
+  """Number of times user downloaded the results of this query"""
+  noOfDownloads: Int
+
+  """Number of times user ran this query"""
+  noOfRuns: Int
+
+  """Number of forks from this query"""
+  noOfForks: Int
+
+  """Query ID from which this query is forked from"""
+  forkedFrom: String
+
+  """Time when the query got created"""
+  createdAt: Time
+
+  """Username details who created the query"""
+  createdBy: SecureUser!
+
+  """Time when the query got updated"""
+  updatedAt: Time
+
+  """User details who updated the query"""
+  updatedBy: SecureUser!
+}
+
+input AirQueryInput {
+  id: ID
+  title: String
+  description: String
+  query: String
+  inputVars: String
+  tags: [String]
+}
+
+enum Blockchain {
+  ethereum
+  polygon
+  gnosis
+  base
+}
+
+input CheckWalletEligibilityForFreeCreditsInput {
+  walletAddress: String!
+}
+
+input CheckoutSessionInput {
+  id: String!
+}
+
+enum CheckoutSessionPaymentStatus {
+  paid
+  unpaid
+  no_payment_required
+}
+
+type CheckoutSessionResult {
+  id: String!
+  paymentStatus: CheckoutSessionPaymentStatus!
+  status: CheckoutSessionStatus!
+}
+
+enum CheckoutSessionStatus {
+  open
+  complete
+  expired
+}
+
+type Credit {
+  id: ID
+  type: String
+  userId: String
+  isPaymentMethodAdded: Boolean
+  initialFreeCreditAllocatedTs: Time
+  subscription: LatestSubscription
+  keys: [Key]
+  createdAt: Time
+  updatedAt: Time
+  deletedAt: Time
+}
+
+type EnsName {
+  name: String
+  isPrimary: Boolean
+}
+
+input ForkQueryInput {
+  queryType: QueryType!
+  queryId: String!
+}
+
+input GenerateQueryTagsInput {
+  query: String!
+  inputVars: String
+}
+
+input GenerateUrlInput {
+  urlType: UrlType!
+  successUrl: String!
+  cancelUrl: String!
+}
+
+input GetAirQueriesInput {
+  tags: [QueryTagInput]
+  orderBy: OrderBy
+  limit: Int
+  skip: Int
+  me: Boolean
+  getFeatured: Boolean
+  cursor: String
+}
+
+type GetAirQueriesOutput {
+  queries: [AirQuery]
+  pageInfo: PageInfo
+}
+
+input GetAirQueryInput {
+  id: String!
+}
+
+type Identity {
+  type: String!
+  value: String!
+}
+
+type ImageSizes {
+  extraSmall: String
+  small: String
+  medium: String
+  large: String
+  original: String
+}
+
+type Invoice {
+  userId: String
+  paymentStatus: String
+  paymentMode: String
+  createdAt: Time
+  updatedAt: Time
+  deletedAt: Time
+}
+
+type Key {
+  id: ID
+  key: String
+  keyHash: String
+  type: KeyType
+  status: KeyStatus
+  userId: String
+  usage: KeyUsage
+  createdAt: Time
+  updatedAt: Time
+  deletedAt: Time
+}
+
+enum KeyStatus {
+  active
+  inactive
+}
+
+enum KeyType {
+  dev
+  prod
+}
+
+type KeyUsage {
+  freeCreditsUsed: Int
+  totalFreeCredits: Int
+  lifetimeCreditsUsed: Int
+  currentCycleCreditsUsed: Int
+  lastUpdatedAt: Time
+}
+
+type LatestSubscription {
+  id: ID!
+  userId: String!
+  status: String!
+  collectionMethod: String
+  startBillingTs: Time
+  nextBillingTs: Time
+  lastBillingTs: Time
+  cancelAtTs: Time
+  endedAtTs: Time
+  createdAt: Time
+  updatedAt: Time
+  deletedAt: Time
+}
+
+input LogUserActionInput {
+  userAction: UserAction!
+  metadata: Map
+  status: UserActionStatus!
+  timestamp: Time!
+}
+
+scalar Map
+
+enum MentionType {
+  NFT_COLLECTION
+  DAO_TOKEN
+  TOKEN
+  POAP
+}
+
+input MetabaseUrlInput {
+  startDate: String!
+  endDate: String!
+  apiKeyHash: String!
+}
+
+type Metadata {
+  tokenMints: Int
+}
+
+type Mutation {
+  """Saves the given query"""
+  SaveQuery(input: AirQueryInput!): AirQuery!
+
+  """Publishes the given query"""
+  PublishQuery(queryId: String!): AirQuery!
+
+  """Unpublishes the given query"""
+  UnpublishQuery(queryId: String!): AirQuery!
+
+  """Forks the given query"""
+  ForkQuery(input: ForkQueryInput!): AirQuery!
+
+  """Discard the saved query"""
+  DiscardSavedQuery(queryId: String!): AirQuery
+  Login: User
+  UpdateUser(input: UpdateUserInput): User
+  LogUserAction(input: LogUserActionInput): Boolean
+  SaveUserAppConfig(input: UserAppConfigInput!): UserAppConfig
+  UnlinkWallet: Boolean!
+}
+
+enum OrderBy {
+  RECENT
+  POPULAR
+  TRENDING
+}
+
+type PageInfo {
+  nextCursor: String
+}
+
+type PublishedAirQueryData {
+  """Title of the published query"""
+  title: String
+
+  """Description of the published query"""
+  description: String
+
+  """Published Graphql query"""
+  query: String
+
+  """Input variables to the published query"""
+  inputVars: String
+
+  """Tags associated to the published query"""
+  tags: [QueryTag]
+
+  """Time when the query got published"""
+  publishedAt: Time
+}
+
+type Query {
+  SearchAIMentions(input: SearchAIMentionsInput!): SearchAIMentionResults
+
+  """Get an query"""
+  GetQuery(input: GetAirQueryInput!): AirQuery
+
+  """Get list of queries"""
+  GetQueries(input: GetAirQueriesInput!): GetAirQueriesOutput
+
+  """Get Predefined Tags based on category"""
+  GetPredefinedTags(category: String): [QueryTag!]
+
+  """Get Query Templates"""
+  GetQueryTemplates: [QueryTemplate]
+
+  """Get Query Template"""
+  GetQueryTemplate(templateID: String!): QueryTemplate
+
+  """Generate Query Tags"""
+  GenerateQueryTags(input: GenerateQueryTagsInput!): [QueryTag]
+  GenerateUrl(input: GenerateUrlInput!): Url!
+  GetCheckoutSessionStatus(input: CheckoutSessionInput!): CheckoutSessionResult!
+  Me: User
+  GetENSNames(input: String!): [EnsName]
+  CheckUserNameIsAvailable(input: String!): Boolean!
+  GetUserAppConfig: UserAppConfig
+  RecentSearches(input: RecentSearchesInput!): RecentSearchesResult
+  CheckWalletEligibilityForFreeCredits(input: CheckWalletEligibilityForFreeCreditsInput!): Wallet!
+  GetMetabaseUrl(input: MetabaseUrlInput!): String!
+}
+
+type QueryTag {
+  label: String
+  thumbnail: String
+  category: String
+  isPredefined: Boolean
+}
+
+input QueryTagInput {
+  label: String!
+  category: String
+  isPredefined: Boolean!
+}
+
+type QueryTemplate {
+  id: String
+  label: String
+  thumbnail: String
+  query: String
+  inputVars: String
+}
+
+enum QueryType {
+  SAVED
+  PUBLISHED
+}
+
+input RecentSearchesInput {
+  userId: String
+}
+
+type RecentSearchesResult {
+  userId: String
+  question: [String]
+}
+
+type SavedAirQueryData {
+  title: String
+  description: String
+  query: String
+  inputVars: String
+  tags: [QueryTag]
+  savedAt: Time
+}
+
+type SearchAIMentionResult {
+  address: String
+  eventId: String
+  name: String
+  type: MentionType
+  tokenType: TokenType
+  symbol: String
+  thumbnailURL: String
+  blockchain: Blockchain
+  metadata: Metadata
+  image: ImageSizes
+}
+
+type SearchAIMentionResults {
+  results: [SearchAIMentionResult]
+  pageInfo: PageInfo
+}
+
+input SearchAIMentionsInput {
+  searchTerm: String
+  blockchain: Blockchain
+  tokenType: TokenType
+  limit: Int
+  cursor: String
+}
+
+type SecureUser {
+  id: String
+  userName: String
+  isVerified: Boolean
+}
+
+scalar Time
+
+enum TokenType {
+  ERC20
+  ERC721
+  ERC1155
+  POAP
+}
+
+input UpdateUserInput {
+  userName: String
+  projectName: String
+  communicationEmail: String
+  walletAddress: String
+  telegramHandle: String
+}
+
+type Url {
+  id: String!
+  url: String!
+}
+
+enum UrlType {
+  subscription
+  cancel_subscription
+  update_payment_method
+  manage_subscription
+}
+
+type User {
+  id: ID!
+  privyId: String!
+  userName: String
+  name: String
+  email: String
+  walletAddress: String
+  projectName: String
+  communicationEmail: String
+  telegramHandle: String
+  isProfileCompleted: Boolean!
+  isVerified: Boolean!
+  isOnboarded: Boolean!
+  credits: [Credit]
+  invoices: [Invoice]
+  createdAt: Time!
+  createdBy: String!
+  updatedAt: Time!
+  updatedBy: String!
+  deletedAt: Time
+}
+
+enum UserAction {
+  RUN_QUERY
+  DOWNLOAD_QUERY_RESULT
+  GENERATE_QUERY_AI
+  HELP
+}
+
+type UserActionLog {
+  userID: String
+  timestamp: Time
+  metadata: Map
+  createdAt: Time
+  userAction: String
+  status: String
+}
+
+enum UserActionStatus {
+  SUCCESS
+  FAILED
+}
+
+type UserAppConfig {
+  highlightAIComponent: Boolean
+  aiQueryExecuted: Boolean
+  freeCreditsModalShown: Boolean
+}
+
+input UserAppConfigInput {
+  highlightAIComponent: Boolean
+  aiQueryExecuted: Boolean
+  freeCreditsModalShown: Boolean
+}
+
+type Wallet {
+  userId: String
+  walletAddress: String
+  isEligible: Boolean
+  identities: [Identity!]
+}
