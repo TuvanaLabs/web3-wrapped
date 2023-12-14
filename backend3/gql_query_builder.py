@@ -1,5 +1,9 @@
 # apollo client:download-schema graphql_schema.json --endpoint=https://graphql.bitquery.io --header="X-API-KEY: BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt"
 
+#  gql-cli https://graphql.bitquery.io --headers X-API-KEY:BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt --print-schema > schema.graphql
+#  gql-cli https://streaming.bitquery.io/graphql --headers X-API-KEY:BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt --print-schema --verbose > schema.graphql
+
+
 from llama_hub.file.sdl.base import SDLReader
 from llama_index.tools.ondemand_loader_tool import OnDemandLoaderTool
 

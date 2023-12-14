@@ -1,127 +1,139 @@
-from typing import Union
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
-
 import uvicorn
+import logging
+import os
 
-# Select your transport with a defined url endpoint
-transport = AIOHTTPTransport(
-    url="https://graphql.bitquery.io",
-    headers={
-        "Content-Type": "application/json",
-        "X-API-KEY": "BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt"
+from typing import Union, Dict
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from gql import gql, Client
+from gql.transport.aiohttp import log as aiohttp_logger
+from gql.transport.aiohttp import AIOHTTPTransport
+from queries import all_queries, sample_prompt_queries
+from pydantic import BaseModel
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Logging configuration
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
+aiohttp_logger.setLevel(logging.ERROR)
+
+
+def initialize_graphql_clients() -> Dict[str, Client]:
+    # Environment variables for configuration
+    endpoints = {
+        "v1": os.getenv("GRAPHQL_ENDPOINT_V1"),
+        "v2": os.getenv("GRAPHQL_ENDPOINT_V2")
     }
-)
+    api_key_v1 = os.getenv("X_API_KEY")
+    bearer_token_v2 = os.getenv("ACCESS_TOKEN")
 
-# Create a GraphQL client using the defined transport
-client = Client(transport=transport, fetch_schema_from_transport=True)
+    clients = {
+        "v1": Client(
+            transport=AIOHTTPTransport(
+                url=endpoints["v1"],
+                headers={"Content-Type": "application/json", "X-API-KEY": api_key_v1}
+            ),
+            fetch_schema_from_transport=True
+        ),
+        "v2": Client(
+            transport=AIOHTTPTransport(
+                url=endpoints["v2"],
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {bearer_token_v2}"}
+            ),
+            fetch_schema_from_transport=True
+        )
+    }
 
+    return clients
+
+
+# Initialize the GraphQL clients
+gql_clients = initialize_graphql_clients()
+
+# FastAPI application setup
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
+
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def root():
+    return "Web3Wrapped"
 
 
-@app.get("/stats/{blockchain_id}")
-def get_stats(blockchain_id: str, q: Union[str, None] = None):
-    # print(blockchain_id)
+async def execute_query(session, query: gql, params: dict) -> dict:
+    try:
+        return await session.execute(query, variable_values=params)
+    except Exception as e:
+        logger.error(f"Error executing query: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-    # Provide a GraphQL query
-    query = gql(
-        """
-query getStats($blockchain_address: String!) {
-  ethereum(network: ethereum) {
-    addressStats(
-      address: {is: $blockchain_address}
-    ) {
-      address {
-        callTxCount
-        calledTxCount
-        receiveFromCount
-        receiveFromCurrencies
-        receiveTxCount
-        sendToCurrencies
-        sendTxCount
-        sendToCount
-        sendAmount
-        daysWithTransfers
-        daysWithTransactions
-        daysWithSent
-        daysWithReceived
-      }
-    }
-    dexTrades(
-      options: {desc: "block.height", limit: 10}
-      makerOrTaker: {is: $blockchain_address}
-      date: {after: "2022-12-31"}
-    ) {
-      transaction {
-        hash
-      }
-      smartContract {
-        address {
-          address
+
+async def run_queries(blockchain_address: str, queries: dict) -> dict:
+    results = {}
+    try:
+        for name, query_info in queries.items():
+            client = gql_clients[query_info["schema_version"]]
+            async with client as session:
+                query = query_info["query"]
+                params = {"blockchain_address": blockchain_address}
+                result = await execute_query(session, query, params)
+                results[name] = result
+    except Exception as e:
+        logger.error(f"Error running queries: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    return results
+
+
+@app.get("/stats/{blockchain_address}")
+async def get_stats(blockchain_address: str, q: Union[str, None] = None) -> dict:
+    if not blockchain_address:
+        raise HTTPException(status_code=400, detail="blockchain_address is required")
+
+    graphql_queries = all_queries
+    combined_result = await run_queries(blockchain_address, graphql_queries)
+    return combined_result
+
+
+class Message(BaseModel):
+    blockchain_address: str
+    prompt: str
+    tag: str
+
+
+@app.post("/chat")
+async def chat(message: Message) -> dict:
+    blockchain_address = message.blockchain_address
+    if not blockchain_address:
+        raise HTTPException(status_code=400, detail="blockchain_address is required")
+
+    graphql_query = sample_prompt_queries[message.tag]
+    params = {"blockchain_address": blockchain_address}
+
+    try:
+        client = gql_clients[graphql_query["schema_version"]]
+        async with client as session:
+            result = await execute_query(session, graphql_query["query"], params)
+
+        return {
+            "data": result,
+            "chart": "",
+            "analysis": ""
         }
-        contractType
-        currency {
-          name
-        }
-      }
-      tradeIndex
-      date {
-        date
-      }
-      block {
-        height
-      }
-      buyAmount
-      buyAmountInUsd: buyAmount(in: USD)
-      buyCurrency {
-        symbol
-        address
-      }
-      sellAmount
-      sellAmountInUsd: sellAmount(in: USD)
-      sellCurrency {
-        symbol
-        address
-      }
-      sellAmountInUsd: sellAmount(in: USD)
-      tradeAmount(in: USD)
-      transaction {
-        gasValue
-        gasPrice
-        gas
-      }
-    }
-  }
-}
-    """
-    )
+    except HTTPException as http_err:
+        raise http_err
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
-    params = {"blockchain_address": blockchain_id}
-
-    # Execute the query on the transport
-    result = client.execute(query, variable_values=params)
-    # print(result)
-
-    return result
-
-#  gql-cli https://graphql.bitquery.io --headers X-API-KEY:BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt --print-schema > schema.graphql
-#  gql-cli https://streaming.bitquery.io/graphql --headers X-API-KEY:BQYM5Cig6QY8Z63BRyHvOh8eI6ve2JXt --print-schema --verbose > schema.graphql
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
