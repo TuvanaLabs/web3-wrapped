@@ -14,6 +14,7 @@ import {
 import SearchBar from './components/SearchBar';
 import StatisticCard from './components/StatisticCard';
 import Chat from "./components/Chat";
+import {useState} from "react";
 
 // type Stat = {
 //     title: string
@@ -23,14 +24,15 @@ import Chat from "./components/Chat";
 const App = () => {
     // const [address, setAddress] = React.useState('');
     const [statistics, setStatistics] = React.useState<{ [key: string]: string }>({});
+    const [address, setAddress] = useState("");
 
     const handleSearch = async (address: string) => {
-        // setAddress(address);
+        setAddress(address);
         try {
             const response = await fetch(`http://localhost:8000/stats/${address}`);
             const data = await response.json();
             console.log(data)
-            setStatistics(data["ethereum"]["addressStats"][0]["address"]);
+            setStatistics(data);
         } catch (error) {
             console.error('Error fetching data:', error);
             setStatistics({});
@@ -54,12 +56,12 @@ const App = () => {
                             <TabPanel>
                                 <SimpleGrid columns={[1, 2, 3]} spacing={10}>
                                     {Object.entries(statistics).map(([key, value], index) => (
-                                        <StatisticCard key={index} title={key} value={String(value)} />
+                                        <StatisticCard key={index} title={key} value={JSON.stringify(value)} />
                                     ))}
                                 </SimpleGrid>
                             </TabPanel>
                             <TabPanel>
-                                <Chat />
+                                <Chat address={address}/>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
