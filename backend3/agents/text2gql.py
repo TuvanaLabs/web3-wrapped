@@ -106,10 +106,10 @@ system_prompt = """
                     Write a graphql query to get the number of transactions for 0x38fa0eAF8C0954c83516951f52600fbc9C10a789
                 OUTPUT:
 ```
-{
+query TransactionCountByAddress($blockchain_address: String!) { {
   EVM(network: eth, dataset: archive) {
     Transactions(
-      where: {Transaction: {From: {is: "0xBBDfc40Fdee73cB6B60d9c88f25641BF111aB8E0"}}}
+      where: {Transaction: {From: {is: $blockchain_address}}}
     ) {
       count(distinct: Transaction_Hash)
     }
@@ -122,10 +122,10 @@ system_prompt = """
                     which tokens did 0xa6Cc3C2531FdaA6Ae1A3CA84c2855806728693e8 mint this year?
                 OUTPUT:
 ```
-{
+query TokensMintedByAddress($blockchain_address: String!) {
   EVM(network: eth, dataset: combined) {
     Transfers(
-      where: {Transfer: {Sender: {is: "0x0000000000000000000000000000000000000000"}, Receiver: {is: "0xdBfd836c989E1FE9586cB0D1BFB35E7849Be23a5"}, Currency: {Fungible: true}}, Block: {Time: {after: "2023-12-01T00:00:00Z"}}}
+      where: {Transfer: {Sender: {is: "0x0000000000000000000000000000000000000000"}, Receiver: {is: $blockchain_address}, Currency: {Fungible: true}}, Block: {Time: {after: "2023-12-01T00:00:00Z"}}}
       orderBy: {descending: Transfer_Currency_SmartContract}
     ) {
       Transaction {
@@ -145,14 +145,14 @@ system_prompt = """
                     Show me the NFTs held by 0xF9d5f52C5B854d52308C31c82D927CE81648D406
                 OUTPUT:
 ```
-{
+query NFTHoldings($blockchain_address: String!) {
   EVM(network: eth, dataset: combined) {
     BalanceUpdates(
       limit: { count: 100 }
       orderBy: { descending: BalanceUpdate_Amount }
       where: {
         BalanceUpdate: {
-          Address: { is: "0xaba7161a7fb69c88e16ed9f455ce62b791ee4d03" }
+          Address: { is: $blockchain_address }
         }
         Currency: { Fungible: false }
       }
@@ -182,10 +182,10 @@ system_prompt = """
                     Write a graphql query to get the number of transactions for 0x38fa0eAF8C0954c83516951f52600fbc9C10a789 since the beginning of 2023
                 OUTPUT:
 ```
-query MyQuery {
+query TransactionCountByAddressFromSpecificDate($blockchain_address: String!) { {
   EVM(network: eth, dataset: archive) {
     Transactions(
-      where: {Transaction: {From: {is: "0xBBDfc40Fdee73cB6B60d9c88f25641BF111aB8E0"}}, Block: {Time: {since: "2023-01-01T00:00:00Z"}}}
+      where: {Transaction: {From: {is: $blockchain_address}}, Block: {Time: {since: "2023-01-01T00:00:00Z"}}}
     ) {
       count(distinct: Transaction_Hash)
     }
@@ -200,8 +200,12 @@ agent = OpenAIAgent.from_tools(
     # verbose=True,
 )
 
-r = agent.chat(
-    'Show me the NFTs held by 0xF9d5f52C5B854d52308C31c82D927CE81648D406'
-    # 'Show me the token transfers performed by 0xF9d5f52C5B854d52308C31c82D927CE81648D406 since March 3rd this year'
-)
-print(r)
+# r = agent.chat(
+#     'Show me the NFTs held by 0xF9d5f52C5B854d52308C31c82D927CE81648D406'
+#     # 'Show me the token transfers performed by 0xF9d5f52C5B854d52308C31c82D927CE81648D406 since March 3rd this year'
+# )
+# print(r)
+
+
+def text_to_graphql(msg: str) -> str:
+    return agent.chat(msg)

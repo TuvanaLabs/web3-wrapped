@@ -11,6 +11,8 @@ from gql.transport.aiohttp import AIOHTTPTransport
 from queries import all_queries, sample_prompt_queries
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from agents.text2gql import text_to_graphql
+from agents.analyst import analyze
 
 # Load environment variables from .env file
 load_dotenv()
@@ -119,14 +121,24 @@ async def chat(message: Message) -> dict:
     params = {"blockchain_address": blockchain_address}
 
     try:
+        query = graphql_query["query"]
         client = gql_clients[graphql_query["schema_version"]]
+
+        # query = text_to_graphql(message.prompt)
+        # print(f"GQL QUERY:\n{query}")
+        # client = gql_clients["v2"]
+
         async with client as session:
-            result = await execute_query(session, graphql_query["query"], params)
+            result = await execute_query(session, query, params)
+
+        # print(f"GQL RESULT:\n{result}")
+
+        analysis = analyze(message.prompt, result)
 
         return {
             "data": result,
             "chart": "",
-            "analysis": ""
+            "analysis": analysis
         }
     except HTTPException as http_err:
         raise http_err

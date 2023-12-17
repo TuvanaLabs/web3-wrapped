@@ -292,9 +292,7 @@ sample_prompt_queries = {
         "query": gql("""
 query getStats($blockchain_address: String!) {
   ethereum(network: ethereum) {
-    addressStats(
-      address: {is: $blockchain_address}
-    ) {
+    addressStats(address: {is: $blockchain_address}) {
       address {
         callTxCount
         calledTxCount
@@ -309,12 +307,46 @@ query getStats($blockchain_address: String!) {
         daysWithTransactions
         daysWithSent
         daysWithReceived
+        receiveAmount
+        balance
+        otherTxCount
+        feeAmount
+        lastTxAt {
+          dayOfMonth
+          month
+          year
+        }
+        lastTransferAt {
+          dayOfMonth
+          month
+          year
+        }
+        firstTxAt {
+          year
+          month
+          dayOfMonth
+        }
+        firstTransferAt {
+          year
+          month
+          dayOfMonth
+        }
       }
     }
+  }
+}
+"""),
+        "schema_version": "v1"
+    },
+
+    "dex_trades": {
+        "query": gql("""
+query getDEXTrades($blockchain_address: String!) {
+  ethereum(network: ethereum) {
     dexTrades(
       options: {desc: "block.height", limit: 10}
       makerOrTaker: {is: $blockchain_address}
-      date: {after: "2022-12-31"}
+      date: {since: "2023-01-01"}
     ) {
       transaction {
         hash
@@ -340,6 +372,7 @@ query getStats($blockchain_address: String!) {
       buyCurrency {
         symbol
         address
+        name
       }
       sellAmount
       sellAmountInUsd: sellAmount(in: USD)
@@ -350,9 +383,7 @@ query getStats($blockchain_address: String!) {
       sellAmountInUsd: sellAmount(in: USD)
       tradeAmount(in: USD)
       transaction {
-        gasValue
-        gasPrice
-        gas
+        hash
       }
     }
   }
