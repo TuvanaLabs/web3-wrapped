@@ -1,18 +1,21 @@
 import uvicorn
 import logging
 import os
+import json
 
-from typing import Union, Dict
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from gql import gql, Client
 from gql.transport.aiohttp import log as aiohttp_logger
 from gql.transport.aiohttp import AIOHTTPTransport
+from typing import Union, Dict
+
 from queries import all_queries, sample_prompt_queries
 from pydantic import BaseModel
-from dotenv import load_dotenv
-from agents.text2gql import text_to_graphql
+from agents.text2data import text_to_data
 from agents.analyst import analyze
+from services.gql2data import run_queries, execute_query
 
 # Load environment variables from .env file
 load_dotenv()
@@ -71,38 +74,24 @@ def root():
     return "Web3Wrapped"
 
 
-async def execute_query(session, query: gql, params: dict) -> dict:
-    try:
-        return await session.execute(query, variable_values=params)
-    except Exception as e:
-        logger.error(f"Error executing query: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-async def run_queries(blockchain_address: str, queries: dict) -> dict:
-    results = {}
-    try:
-        for name, query_info in queries.items():
-            client = gql_clients[query_info["schema_version"]]
-            async with client as session:
-                query = query_info["query"]
-                params = {"blockchain_address": blockchain_address}
-                result = await execute_query(session, query, params)
-                results[name] = result
-    except Exception as e:
-        logger.error(f"Error running queries: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-    return results
-
-
 @app.get("/stats/{blockchain_address}")
 async def get_stats(blockchain_address: str, q: Union[str, None] = None) -> dict:
     if not blockchain_address:
         raise HTTPException(status_code=400, detail="blockchain_address is required")
 
     graphql_queries = all_queries
-    combined_result = await run_queries(blockchain_address, graphql_queries)
+    combined_result = await run_queries(blockchain_address, graphql_queries, gql_clients)
     return combined_result
+
+
+f = open('stats.json')
+mock_data = json.load(f)
+f.close()
+
+
+@app.get("/mocks/stats")
+async def get_mock_stats() -> dict:
+    return mock_data
 
 
 class Message(BaseModel):
@@ -117,21 +106,19 @@ async def chat(message: Message) -> dict:
     if not blockchain_address:
         raise HTTPException(status_code=400, detail="blockchain_address is required")
 
-    graphql_query = sample_prompt_queries[message.tag]
     params = {"blockchain_address": blockchain_address}
 
     try:
+        # tag pre-processed solution
+        graphql_query = sample_prompt_queries[message.tag]
         query = graphql_query["query"]
         client = gql_clients[graphql_query["schema_version"]]
-
-        # query = text_to_graphql(message.prompt)
-        # print(f"GQL QUERY:\n{query}")
-        # client = gql_clients["v2"]
-
         async with client as session:
             result = await execute_query(session, query, params)
 
-        # print(f"GQL RESULT:\n{result}")
+        # dynamic solution
+        # client = gql_clients["v2"]
+        # result = await text_to_data(message.prompt, params, client)
 
         analysis = analyze(message.prompt, result)
 

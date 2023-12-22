@@ -12,6 +12,11 @@ def analyze(question: str, data) -> str:
     
     DATA:
     {data}
+    
+    HINT:
+    1. The data always contains what is necessary to answer the question.
+    2. If the data contains empty fields or arrays, consider them to be zero-values.
+    3. Do not interpret them as non-existent values.
     """
 
     # print(prompt)

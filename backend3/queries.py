@@ -45,57 +45,55 @@ query TopAccountsReceivedFrom($blockchain_address: String!) {
         "schema_version": "v1"
     },
 
-    "largest_sends": {
-        "query": gql("""
-query LargestSends($blockchain_address: String!) {
-  EVM(dataset: combined, network: eth) {
-    Transfers(
-      where: {
-        Transfer: {Sender: {is: $blockchain_address}}, 
-        Block: {Date: {since: "2023-01-01"}}
-      }
-      orderBy: {descending: Transaction_Value}
-      limit: {count: 5}
-    ) {
-      Transfer {
-        Amount(maximum: Transfer_Amount)
-        Currency {
-          Name
-          SmartContract
-        }
-      }
-    }
-  }
-}
-    """),
-        "schema_version": "v2"
-    },
-
-    "largest_receives": {
-        "query": gql("""
-query LargestReceives($blockchain_address: String!) {
-  EVM(dataset: combined, network: eth) {
-    Transfers(
-      where: {
-        Transfer: {Receiver: {is: $blockchain_address}},
-      	Block: {Date: {since: "2023-01-01"}}
-      }
-      orderBy: {descending: Transaction_Value}
-      limit: {count: 5}
-    ) {
-      Transfer {
-        Amount(maximum: Transfer_Amount)
-        Currency {
-          Name
-          SmartContract
-        }
-      }
-    }
-  }
-}
-    """),
-        "schema_version": "v2"
-    },
+#     "largest_sends": {
+#         "query": gql("""
+# query LargestSends($blockchain_address: String!) {
+#   EVM(dataset: combined, network: eth) {
+#     Transfers(
+#       where: {
+#         Transfer: {Sender: {is: $blockchain_address}},
+#         Block: {Date: {since: "2023-01-01"}}
+#       }
+#       orderBy: {descending: Transaction_Value}
+#       limit: {count: 3}
+#     ) {
+#       Transaction {
+#         Hash
+#         To
+#         Value(maximum: Transaction_Value)
+#       }
+#     }
+#   }
+# }
+#     """),
+#         "schema_version": "v2"
+#     },
+#
+#     "largest_receives": {
+#         "query": gql("""
+# query LargestReceives($blockchain_address: String!) {
+#   EVM(dataset: combined, network: eth) {
+#     Transfers(
+#       where: {
+#         Transfer: {Receiver: {is: $blockchain_address}},
+#       	Block: {Date: {since: "2023-01-01"}}
+#       }
+#       orderBy: {descending: Transaction_Value}
+#       limit: {count: 5}
+#     ) {
+#       Transfer {
+#         Amount(maximum: Transfer_Amount)
+#         Currency {
+#           Name
+#           SmartContract
+#         }
+#       }
+#     }
+#   }
+# }
+#     """),
+#         "schema_version": "v2"
+#     },
 
     "largest_fee_paid": {
         "query": gql("""
@@ -284,7 +282,49 @@ query NFTsBurned($blockchain_address: String!) {
 }
     """),
         "schema_version": "v2"
+    },
+
+    "monthly_transactions_sent": {
+        "query": gql("""
+query MonthlyTransactionsSent($blockchain_address: String!) {
+  EVM(network: eth, dataset: combined) {
+    Transactions(
+      where: {
+        Transaction: {From: {is: $blockchain_address}},
+        Block: {Date: {since: "2023-01-01"}}
+      }
+    ) {
+      count(distinct: Transaction_Hash)
+      Block {
+        Date(interval: {in: months})
+      }
     }
+  }
+}
+    """),
+        "schema_version": "v2"
+    },
+
+    "monthly_transactions_received": {
+        "query": gql("""
+query MonthlyTransactionsReceived($blockchain_address: String!) {
+  EVM(network: eth, dataset: combined) {
+    Transactions(
+      where: {
+        Transaction: {To: {is: $blockchain_address}},
+        Block: {Date: {since: "2023-01-01"}}
+      }
+    ) {
+      count(distinct: Transaction_Hash)
+      Block {
+        Date(interval: {in: months})
+      }
+    }
+  }
+}
+    """),
+        "schema_version": "v2"
+    },
 }
 
 sample_prompt_queries = {
