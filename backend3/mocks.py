@@ -1,4 +1,4 @@
-mock = """
+mock_stats = """
 {
     "top_accounts_sent_to": {
         "ethereum": {

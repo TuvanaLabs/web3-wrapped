@@ -17,6 +17,8 @@ from agents.text2data import text_to_data
 from agents.analyst import analyze
 from services.gql2data import run_queries, execute_query
 
+from mocks import mock_stats
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -84,13 +86,9 @@ async def get_stats(blockchain_address: str, q: Union[str, None] = None) -> dict
     return combined_result
 
 
-f = open('stats.json')
-mock_data = json.load(f)
-f.close()
-
-
 @app.get("/mocks/stats")
 async def get_mock_stats() -> dict:
+    mock_data = json.loads(mock_stats)
     return mock_data
 
 
