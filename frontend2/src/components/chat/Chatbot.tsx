@@ -166,13 +166,25 @@ export default function Chatbot() {
                 //     'Something went wrong. Please try again later.',
                 // );
 
-                toast({
-                    // title: 'Account created.',
-                    description: 'Something went wrong. Please try again later.',
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                });
+                if(response.status === 429) {
+                    toast({
+                        // title: 'Account created.',
+                        description: 'Too many requests. Please try again later.',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
+
+                else {
+                    toast({
+                        // title: 'Account created.',
+                        description: 'Something went wrong. Please try again later.',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
             }
 
             ReactGA.event({

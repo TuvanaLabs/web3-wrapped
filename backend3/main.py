@@ -6,7 +6,7 @@ import json
 import redis
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from gql import gql, Client
 from gql.transport.aiohttp import log as aiohttp_logger
@@ -20,6 +20,7 @@ from pydantic import BaseModel
 from agents.text2data import text_to_data
 from agents.analyst import analyze
 from services.gql2data import run_queries, execute_query
+from middleware.rate_limit import RateLimitMiddleware
 
 from mocks import mock_stats
 
@@ -95,7 +96,7 @@ def root():
     return "Web3Wrapped"
 
 
-@app.get("/stats/{blockchain_address}")
+@app.get("/stats/{blockchain_address}", dependencies=[Depends(RateLimitMiddleware())])
 async def get_stats(blockchain_address: str, q: Union[str, None] = None) -> dict:
     if not blockchain_address:
         raise HTTPException(status_code=400, detail="blockchain_address is required")
@@ -115,8 +116,8 @@ async def get_stats(blockchain_address: str, q: Union[str, None] = None) -> dict
     return combined_result
 
 
-@app.get("/mocks/stats")
-async def get_mock_stats() -> dict:
+@app.get("/mocks/stats", dependencies=[Depends(RateLimitMiddleware())])
+async def get_mock_stats(request: Request) -> dict:
     mock_data = json.loads(mock_stats)
     return mock_data
 
@@ -127,7 +128,7 @@ class Message(BaseModel):
     tag: str
 
 
-@app.post("/chat")
+@app.post("/chat", dependencies=[Depends(RateLimitMiddleware())])
 async def chat(message: Message) -> dict:
     blockchain_address = message.blockchain_address
     if not blockchain_address:
@@ -163,7 +164,7 @@ async def chat(message: Message) -> dict:
         json_object = json.dumps(combined_result)
         redis_client.setex(cache_key, CACHE_EXPIRY, json_object)
 
-        return result
+        return combined_result
     except HTTPException as http_err:
         raise http_err
     except Exception as e:

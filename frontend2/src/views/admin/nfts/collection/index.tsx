@@ -94,9 +94,9 @@ export default function Collection() {
 			const data = await response.json();
 			// console.log(data["monthly_transactions_sent"]["EVM"]["Transactions"])
 
-			// if(response.status !== 200) {
-			// 	throw new Error(`request failed with ${data['detail']}`);
-			// }
+			if(response.status !== 200) {
+				throw new Error(`request failed with ${data['detail']}`);
+			}
 
 			// console.log(`retrieved stats for ${blockchain_address}`);
 			return data;
@@ -122,14 +122,25 @@ export default function Collection() {
 					});
 				})
 				.catch(err => {
-					toast({
-						// title: 'Account created.',
-						description: 'Failed to get stats. Please try again later.',
-						status: 'error',
-						duration: 3000,
-						isClosable: true,
-					});
-					console.error(err);
+					if(err.toString().includes("request limit reached")) {
+						toast({
+							// title: 'Account created.',
+							description: 'Too many requests. Please try again later.',
+							status: 'error',
+							duration: 3000,
+							isClosable: true,
+						});
+					}
+					else {
+						toast({
+							// title: 'Account created.',
+							description: 'Failed to get stats. Please try again later.',
+							status: 'error',
+							duration: 3000,
+							isClosable: true,
+						});
+					}
+					// console.error(err);
 					setStats({});
 
 
