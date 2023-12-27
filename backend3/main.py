@@ -64,7 +64,12 @@ gql_clients = initialize_graphql_clients()
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        # "*"
+        "35.160.120.126",
+        "44.233.151.27",
+        "34.211.200.85",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
