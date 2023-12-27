@@ -5,7 +5,36 @@ import { Button, Flex, Link, Text, Image } from '@chakra-ui/react';
 import banner from 'assets/img/nfts/NftBanner2.png';
 import navImage from 'assets/img/crm/navbar.png';
 
+import ReactGA from "react-ga4";
+
 export default function BottomBanner() {
+    const gaMeasurementID = process.env.REACT_APP_GA_MEASUREMENT_ID;
+    ReactGA.initialize(gaMeasurementID);
+
+    const handlePreorder = () => {
+        ReactGA.event({
+            action: "Clicked 'Pre-order PRO'",
+            category: "Purchase",
+            label: "Button",
+            nonInteraction: false,
+            // transport: undefined,
+            // value: 0
+        });
+        // console.log("sent to GA");
+    }
+
+    const handleJoinWaitlist = () => {
+        ReactGA.event({
+            action: "Clicked 'Join waitlist'",
+            category: "Waitlist",
+            label: "Button",
+            nonInteraction: false,
+            // transport: undefined,
+            // value: 0
+        });
+        // console.log("sent to GA");
+    }
+
     // Chakra Color Mode
     return (
         <Flex
@@ -75,12 +104,14 @@ export default function BottomBanner() {
                         as={"a"}
                         target={"_blank"}
                         href={"https://tuvanalabs.com/preorder"}
+                        onClick={handlePreorder}
                     >
                         Pre-order PRO
                     </Button>
                     <Link
                         target={"_blank"}
                         href={"https://tuvanalabs.com/waitlist"}
+                        onClick={handleJoinWaitlist}
                     >
                         <Text
                             color="white"

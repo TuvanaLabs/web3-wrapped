@@ -10,8 +10,16 @@ import initialTheme from './theme/theme'; //  { themeGreen }
 import { useState } from 'react';
 // Chakra imports
 
+import ReactGA from "react-ga4";
+
 export default function Main() {
-  // eslint-disable-next-line
+
+    const gaMeasurementID = process.env.REACT_APP_GA_MEASUREMENT_ID;
+    // console.log(gaMeasurementID)
+    ReactGA.initialize(gaMeasurementID);
+
+
+    // eslint-disable-next-line
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
   return (
     <ChakraProvider theme={currentTheme}>

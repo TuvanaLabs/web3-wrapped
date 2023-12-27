@@ -26,9 +26,18 @@ import { MdAutoAwesome, MdBolt, MdEdit, MdPerson } from 'react-icons/md';
 import Bg from 'assets/img/chat/bg-image.png';
 import {useAccount} from "wagmi";
 
+
+import ReactGA from "react-ga4";
+
+
 const serverURL = process.env.REACT_APP_WEB3_WRAPPED_SERVER_URL;
 
 export default function Chatbot() {
+
+    const gaMeasurementID = process.env.REACT_APP_GA_MEASUREMENT_ID;
+    ReactGA.initialize(gaMeasurementID);
+    ReactGA.send({ hitType: "pageview", page: "/chat", title: "Web3 Assistant" });
+
     // *** If you use .env.local variable for your API key, method which we recommend, use the apiKey variable commented below
     // const { apiKeyApp } = props;
     // Input States
@@ -165,6 +174,16 @@ export default function Chatbot() {
                     isClosable: true,
                 });
             }
+
+            ReactGA.event({
+                action: "Failed to Resolve Sample Prompt",
+                category: "Prompt",
+                label: "Error",
+                nonInteraction: false,
+                // transport: undefined,
+                // value: 0
+            });
+
             return;
         }
 
@@ -197,6 +216,16 @@ export default function Chatbot() {
         //     const chunkValue = decoder.decode(value);
         //     setBotResponse((prevCode) => prevCode + chunkValue);
         // }
+
+
+        ReactGA.event({
+            action: "Sent Sample Prompt",
+            category: "Prompt",
+            label: "Button",
+            nonInteraction: false,
+            // transport: undefined,
+            // value: 0
+        });
 
         setBotResponse(data["analysis"]);
         setLoading(false);

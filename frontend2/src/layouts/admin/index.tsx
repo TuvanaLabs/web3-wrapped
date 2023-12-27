@@ -14,8 +14,17 @@ import { useState } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import routes from 'routes';
 
+import ReactGA from "react-ga4";
+
+
+
 // Custom Chakra theme
 export default function Dashboard(props: { [x: string]: any }) {
+
+  const gaMeasurementID = process.env.REACT_APP_GA_MEASUREMENT_ID;
+  ReactGA.initialize(gaMeasurementID);
+  ReactGA.send({ hitType: "pageview", page: "/home", title: "Welcome" });
+
   const { ...rest } = props;
 
   // states and functions

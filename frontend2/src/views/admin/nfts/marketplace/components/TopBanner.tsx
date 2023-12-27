@@ -7,10 +7,24 @@ import { useNavigate } from 'react-router-dom';
 // Assets
 import banner from 'assets/img/nfts/NftBanner1.png';
 
+import ReactGA from "react-ga4";
+
 export default function TopBanner() {
+    const gaMeasurementID = process.env.REACT_APP_GA_MEASUREMENT_ID;
+    ReactGA.initialize(gaMeasurementID);
 
     const navigate = useNavigate();
-    const handleClick = () => navigate('/wrapped');
+    const handleClick = () => {
+        ReactGA.event({
+            action: "Clicked 'Get Started'",
+            category: "Navigation",
+            label: "Button",
+            nonInteraction: false,
+            // transport: undefined,
+            // value: 0
+        });
+        navigate('/wrapped');
+    }
 
     // Chakra Color Mode
     return (

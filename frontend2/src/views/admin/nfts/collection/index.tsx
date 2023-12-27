@@ -65,10 +65,18 @@ import {useEffect, useState} from "react";
 import MonthlyActivity from "./components/stats/charts/MonthlyActivity";
 
 
+import ReactGA from "react-ga4";
+
 
 const serverURL = process.env.REACT_APP_WEB3_WRAPPED_SERVER_URL;
 
 export default function Collection() {
+	const gaMeasurementID = process.env.REACT_APP_GA_MEASUREMENT_ID;
+	// console.log(gaMeasurementID)
+	ReactGA.initialize(gaMeasurementID);
+
+	ReactGA.send({ hitType: "pageview", page: "/wrapped", title: "2023 Wrapped" });
+
 	const textColor = useColorModeValue('secondaryGray.900', 'white');
 
 	const toast = useToast({position: "top-right"});
@@ -103,6 +111,15 @@ export default function Collection() {
 					// console.log(r)
 					setStats(r);
 					setIsLoaded(true);
+
+					ReactGA.event({
+						action: "Loaded Stats",
+						category: "Wrapped",
+						label: "Button",
+						nonInteraction: true,
+						// transport: undefined,
+						// value: 0
+					});
 				})
 				.catch(err => {
 					toast({
@@ -114,6 +131,16 @@ export default function Collection() {
 					});
 					console.error(err);
 					setStats({});
+
+
+					ReactGA.event({
+						action: "Failed To Load Stats",
+						category: "Wrapped",
+						label: "Error",
+						nonInteraction: true,
+						// transport: undefined,
+						// value: 0
+					});
 				});
 		}
 	}, [address]);
