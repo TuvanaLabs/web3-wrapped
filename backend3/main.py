@@ -3,6 +3,8 @@ import logging
 import os
 import json
 
+import redis
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +12,8 @@ from gql import gql, Client
 from gql.transport.aiohttp import log as aiohttp_logger
 from gql.transport.aiohttp import AIOHTTPTransport
 from typing import Union, Dict
+
+from redis import Redis
 
 from queries import all_queries, sample_prompt_queries
 from pydantic import BaseModel
@@ -60,6 +64,16 @@ def initialize_graphql_clients() -> Dict[str, Client]:
 # Initialize the GraphQL clients
 gql_clients = initialize_graphql_clients()
 
+
+redis_url = os.getenv("REDIS_URL")
+redis_client: Redis = redis.from_url(
+    redis_url,
+    encoding="utf-8",
+    decode_responses=True
+)
+CACHE_EXPIRY = 43200  # seconds
+
+
 # FastAPI application setup
 app = FastAPI()
 app.add_middleware(
@@ -86,8 +100,18 @@ async def get_stats(blockchain_address: str, q: Union[str, None] = None) -> dict
     if not blockchain_address:
         raise HTTPException(status_code=400, detail="blockchain_address is required")
 
+    cache_key = f"stats-{blockchain_address}"
+    if redis_client.exists(cache_key) > 0:
+        cached_result = redis_client.get(cache_key)
+        if cached_result is not None:
+            return json.loads(cached_result)
+
     graphql_queries = all_queries
     combined_result = await run_queries(blockchain_address, graphql_queries, gql_clients)
+
+    json_object = json.dumps(combined_result)
+    redis_client.setex(cache_key, CACHE_EXPIRY, json_object)
+
     return combined_result
 
 
@@ -112,6 +136,12 @@ async def chat(message: Message) -> dict:
     params = {"blockchain_address": blockchain_address}
 
     try:
+        cache_key = f"chat-{blockchain_address}-{message.tag}"
+        if redis_client.exists(cache_key) > 0:
+            cached_result = redis_client.get(cache_key)
+            if cached_result is not None:
+                return json.loads(cached_result)
+
         # tag pre-processed solution
         graphql_query = sample_prompt_queries[message.tag]
         query = graphql_query["query"]
@@ -124,12 +154,16 @@ async def chat(message: Message) -> dict:
         # result = await text_to_data(message.prompt, params, client)
 
         analysis = analyze(message.prompt, result)
-
-        return {
+        combined_result = {
             "data": result,
             "chart": "",
             "analysis": analysis
         }
+
+        json_object = json.dumps(combined_result)
+        redis_client.setex(cache_key, CACHE_EXPIRY, json_object)
+
+        return result
     except HTTPException as http_err:
         raise http_err
     except Exception as e:
