@@ -416,7 +416,7 @@ export default function HeaderLinks(props: { [x: string]: any }) {
     DefaultSidebar,
     DefaultSidebarDark,
   );
-  const navbarIcon = useColorModeValue('gray.400', 'white');
+  const navbarIcon = useColorModeValue('gray.700', 'white');
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const brandColor = useColorModeValue('brand.500', 'white');
   const bgBadge = useColorModeValue('brand.50', 'whiteAlpha.100');

@@ -37,7 +37,6 @@ import {
 } from 'wagmi'
 
 // Custom components
-import Banner from 'views/admin/nfts/marketplace/components/Banner';
 import NFT from 'components/card/NFT';
 import { SearchBar } from 'views/admin/nfts/collection/components/Search';
 

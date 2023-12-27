@@ -50,34 +50,47 @@ export default function Footer() {
           <Link
               fontWeight="500"
               color={textColor}
+              target={"_blank"}
               href="https://www.tuvanalabs.com/"
           >
             About Tuvana Labs
           </Link>
         </ListItem>
-        <ListItem
-          me={{
-            base: '20px',
-            md: '44px',
-          }}
+        {/*<ListItem*/}
+        {/*  me={{*/}
+        {/*    base: '20px',*/}
+        {/*    md: '44px',*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  <Link*/}
+        {/*    fontWeight="500"*/}
+        {/*    color={textColor}*/}
+        {/*    href="mailto:info@tuvanalabs.com"*/}
+        {/*  >*/}
+        {/*    Support*/}
+        {/*  </Link>*/}
+        {/*</ListItem>*/}
+
+      {/*<ListItem>*/}
+      {/*  <Link*/}
+      {/*    fontWeight="500"*/}
+      {/*    color={textColor}*/}
+      {/*    href="https://www.tuvanalabs.com/blog"*/}
+      {/*  >*/}
+      {/*    Blog*/}
+      {/*  </Link>*/}
+      {/*</ListItem>*/}
+
+      <ListItem>
+        <Link
+          fontWeight="500"
+          color={textColor}
+          target={"_blank"}
+          href="https://www.twitter.com/web3wrapped"
         >
-          <Link
-            fontWeight="500"
-            color={textColor}
-            href="mailto:info@tuvanalabs.com"
-          >
-            Support
-          </Link>
-        </ListItem>
-        <ListItem>
-          <Link
-            fontWeight="500"
-            color={textColor}
-            href="https://www.tuvanalabs.com/blog"
-          >
-            Blog
-          </Link>
-        </ListItem>
+          Twitter
+        </Link>
+      </ListItem>
       </List>
     </Flex>
   );

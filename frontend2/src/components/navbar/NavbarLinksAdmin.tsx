@@ -67,54 +67,61 @@ export default function HeaderLinks(props: {
         <w3m-button />
       </Box>
       <SidebarResponsive routes={routes} />
-      <Menu>
-        <MenuList
-          boxShadow={shadow}
-          p="20px"
-          borderRadius="20px"
-          bg={menuBg}
-          border="none"
-          mt="22px"
-          me={{ base: '30px', md: 'unset' }}
-          minW={{ base: 'unset', md: '400px', xl: '450px' }}
-          maxW={{ base: '360px', md: 'unset' }}
-        >
-          <Flex w="100%" mb="20px">
-            <Text fontSize="md" fontWeight="600" color={textColor}>
-              Notifications
-            </Text>
-            <Text
-              fontSize="sm"
-              fontWeight="500"
-              color={textColorBrand}
-              ms="auto"
-              cursor="pointer"
-            >
-              Mark all read
-            </Text>
-          </Flex>
-          <Flex flexDirection="column">
-            <MenuItem
-              _hover={{ bg: 'none' }}
-              _focus={{ bg: 'none' }}
-              px="0"
-              borderRadius="8px"
-              mb="10px"
-            >
-              <ItemContent info="Web3Wrapped Basic" />
-            </MenuItem>
-            <MenuItem
-              _hover={{ bg: 'none' }}
-              _focus={{ bg: 'none' }}
-              px="0"
-              borderRadius="8px"
-              mb="10px"
-            >
-              <ItemContent info="Horizon Design System Free" />
-            </MenuItem>
-          </Flex>
-        </MenuList>
-      </Menu>
+      <Configurator
+          mini={props.mini}
+          setMini={props.setMini}
+          theme={theme}
+          setTheme={setTheme}
+      />
+
+      {/*<Menu>*/}
+      {/*  <MenuList*/}
+      {/*    boxShadow={shadow}*/}
+      {/*    p="20px"*/}
+      {/*    borderRadius="20px"*/}
+      {/*    bg={menuBg}*/}
+      {/*    border="none"*/}
+      {/*    mt="22px"*/}
+      {/*    me={{ base: '30px', md: 'unset' }}*/}
+      {/*    minW={{ base: 'unset', md: '400px', xl: '450px' }}*/}
+      {/*    maxW={{ base: '360px', md: 'unset' }}*/}
+      {/*  >*/}
+      {/*    <Flex w="100%" mb="20px">*/}
+      {/*      <Text fontSize="md" fontWeight="600" color={textColor}>*/}
+      {/*        Notifications*/}
+      {/*      </Text>*/}
+      {/*      <Text*/}
+      {/*        fontSize="sm"*/}
+      {/*        fontWeight="500"*/}
+      {/*        color={textColorBrand}*/}
+      {/*        ms="auto"*/}
+      {/*        cursor="pointer"*/}
+      {/*      >*/}
+      {/*        Mark all read*/}
+      {/*      </Text>*/}
+      {/*    </Flex>*/}
+      {/*    <Flex flexDirection="column">*/}
+      {/*      <MenuItem*/}
+      {/*        _hover={{ bg: 'none' }}*/}
+      {/*        _focus={{ bg: 'none' }}*/}
+      {/*        px="0"*/}
+      {/*        borderRadius="8px"*/}
+      {/*        mb="10px"*/}
+      {/*      >*/}
+      {/*        <ItemContent info="Web3Wrapped Basic" />*/}
+      {/*      </MenuItem>*/}
+      {/*      <MenuItem*/}
+      {/*        _hover={{ bg: 'none' }}*/}
+      {/*        _focus={{ bg: 'none' }}*/}
+      {/*        px="0"*/}
+      {/*        borderRadius="8px"*/}
+      {/*        mb="10px"*/}
+      {/*      >*/}
+      {/*        <ItemContent info="Horizon Design System Free" />*/}
+      {/*      </MenuItem>*/}
+      {/*    </Flex>*/}
+      {/*  </MenuList>*/}
+      {/*</Menu>*/}
 
       {/*<Menu>*/}
       {/*  <MenuButton p="0px">*/}
@@ -177,12 +184,7 @@ export default function HeaderLinks(props: {
       {/*    </Flex>*/}
       {/*  </MenuList>*/}
       {/*</Menu>*/}
-      <Configurator
-        mini={props.mini}
-        setMini={props.setMini}
-        theme={theme}
-        setTheme={setTheme}
-      />
+
     </Flex>
   );
 }

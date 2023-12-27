@@ -30,9 +30,10 @@ import {
   StatsIcon,
 } from "./components/icons/Icons";
 import Chatbot from "./components/chat/Chatbot";
-import Banner from "./views/admin/nfts/marketplace/components/Banner";
+import TopBanner from "./views/admin/nfts/marketplace/components/TopBanner";
 import DAOAssistant from "./views/admin/assistants/DAOAssistant";
 import HomeBody from "./views/admin/main/body/HomeBody";
+import BottomBanner from "./views/admin/nfts/marketplace/components/BottomBanner";
 
 
 const routes = [
@@ -42,11 +43,12 @@ const routes = [
     path: '/home',
     icon: <Icon as={RiHome2Fill} width="20px" height="20px" color="inherit" />,
     component: (
-        <Box pt={{ base: '180px', md: '80px', xl: '80px' }} overflowX={"hidden"}>
-            <Flex flexDirection='column'>
-              <Banner />
-              <HomeBody referralCode={""} fbLink={""} twtLink={""} />
-            </Flex>
+        <Box pt={{base: '180px', md: '80px', xl: '80px'}} overflowX={"hidden"}>
+          <Flex flexDirection='column'>
+            <TopBanner/>
+            <HomeBody referralCode={""} fbLink={""} twtLink={""}/>
+            <BottomBanner/>
+          </Flex>
         </Box>
     ),
     secondary: false,

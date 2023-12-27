@@ -107,9 +107,10 @@ export default function TopAccounts(props: TopAccountProps) {
                 xaxis: {
                     ...chartOptions.xaxis,
                     categories: processed.categories,
-                    // labels: {
+                    labels: {
+                        trim: true,
                     //   formatter: truncateAddress
-                    // },
+                    },
                 },
                 yaxis: {
                     ...chartOptions.yaxis,
