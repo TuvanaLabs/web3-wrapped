@@ -2,6 +2,8 @@
 import { Button, Flex, Link, Text, Image } from '@chakra-ui/react';
 import { useDisclosure } from "@chakra-ui/react";
 import { useNavigate } from 'react-router-dom';
+import { FaRegCirclePlay } from "react-icons/fa6";
+
 
 
 // Assets
@@ -88,8 +90,10 @@ export default function TopBanner() {
                         px="27"
                         me="38px"
                         onClick={handleClick}
+                        boxShadow='0 8px 8px -4px lightblue'
+                        leftIcon={<FaRegCirclePlay/>}
                     >
-                        Get Started
+                        Generate Yours
                     </Button>
                     {/*<Link>*/}
                     {/*    <Text*/}

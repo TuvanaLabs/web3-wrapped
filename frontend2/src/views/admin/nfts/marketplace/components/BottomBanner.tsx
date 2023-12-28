@@ -6,6 +6,7 @@ import banner from 'assets/img/nfts/NftBanner2.png';
 import navImage from 'assets/img/crm/navbar.png';
 
 import ReactGA from "react-ga4";
+import { IoBagAdd } from "react-icons/io5";
 
 export default function BottomBanner() {
     const gaMeasurementID = process.env.REACT_APP_GA_MEASUREMENT_ID;
@@ -105,6 +106,8 @@ export default function BottomBanner() {
                         target={"_blank"}
                         href={"https://tuvanalabs.com/preorder"}
                         onClick={handlePreorder}
+                        boxShadow='0 8px 8px -4px lightblue'
+                        leftIcon={<IoBagAdd/>}
                     >
                         Pre-order PRO
                     </Button>
