@@ -21,7 +21,7 @@ const metadata = {
 const chains = [mainnet]
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
 
-createWeb3Modal({ wagmiConfig, projectId, chains })
+createWeb3Modal({ wagmiConfig, projectId, chains, themeMode: 'dark' })
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

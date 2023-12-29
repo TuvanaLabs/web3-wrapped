@@ -13,7 +13,10 @@ import { globalStyles } from './styles';
 // import { globalStyles as globalStylesRed } from './stylesRed';
 
 let theme = extendTheme(
-  { breakpoints }, // Breakpoints
+  {
+      breakpoints, // Breakpoints
+      config: {initialColorMode: 'dark'}, // default to dark mode
+  },
   globalStyles,
   badgeStyles, // badge styles
   buttonStyles, // button styles
