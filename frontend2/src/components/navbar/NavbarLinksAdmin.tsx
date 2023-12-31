@@ -44,7 +44,7 @@ export default function HeaderLinks(props: {
   const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
   return (
     <Flex
-      w={{ sm: '100%', md: 'auto' }}
+      w={{ sm: 'max-content', md: 'auto' }}
       alignItems="center"
       flexDirection="row"
       bg={menuBg}
@@ -67,12 +67,12 @@ export default function HeaderLinks(props: {
         <w3m-button />
       </Box>
       <SidebarResponsive routes={routes} />
-      <Configurator
-          mini={props.mini}
-          setMini={props.setMini}
-          theme={theme}
-          setTheme={setTheme}
-      />
+      {/*<Configurator*/}
+      {/*    mini={props.mini}*/}
+      {/*    setMini={props.setMini}*/}
+      {/*    theme={theme}*/}
+      {/*    setTheme={setTheme}*/}
+      {/*/>*/}
 
       {/*<Menu>*/}
       {/*  <MenuList*/}
