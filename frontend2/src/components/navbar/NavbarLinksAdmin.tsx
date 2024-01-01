@@ -64,7 +64,7 @@ export default function HeaderLinks(props: {
       {/*  borderRadius="20px"*/}
       {/*/>*/}
       <Box mr={3}>
-        <w3m-button />
+        <w3m-button balance='hide' />
       </Box>
       <SidebarResponsive routes={routes} />
       {/*<Configurator*/}

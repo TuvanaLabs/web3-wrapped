@@ -12,9 +12,9 @@ const projectId = process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID;
 // console.log(projectId)
 
 const metadata = {
-    name: 'Web3Modal',
-    description: 'Web3Modal Example',
-    url: 'https://web3modal.com',
+    name: 'Web3Wrapped',
+    description: 'Web3Wrapped',
+    url: 'https://web3wrapped.xyz',
     icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
